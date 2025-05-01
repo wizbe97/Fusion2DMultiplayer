@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6493560806560879542
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7539285009767304139}
+  - component: {fileID: 4011419109246890317}
+  - component: {fileID: 4958121450383132593}
+  m_Layer: 0
+  m_Name: Launcher
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7539285009767304139
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6493560806560879542}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 216.38635, y: 429.2343, z: 2.9581442}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4011419109246890317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6493560806560879542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b872bb607fc3a6840abe2c30771d164b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4958121450383132593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6493560806560879542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbfedab3fc0860a4780bb1285fefbc7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerDataNO:
+    RawGuidValue: 5cf1c1c3bfd0c6b4b8b7e3ee2cb38145
+  OnPlayerJoinedEvent: {fileID: 11400000, guid: d85e630851d6bce4e94898fb9f40fb55, type: 2}
+  OnPlayerLeftEvent: {fileID: 11400000, guid: 10623ea0c150657439b1026b986e893b, type: 2}
+  OnShutdownEvent: {fileID: 11400000, guid: 36d5e3658179b8b469220795376261aa, type: 2}
+  OnDisconnectedEvent: {fileID: 11400000, guid: 1b38ce383453ce448876322a0e748ddc, type: 2}
