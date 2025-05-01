@@ -27,6 +27,7 @@ public class LevelManager : NetworkSceneManagerDefault
         // {
         //     loadingManager.StartLoadingScreen();
         // }
+        Debug.Log("LoadScene called");
         GameManager.Instance?.SetGameState(GameManager.GameState.Loading);
         Launcher.SetConnectionStatus(FusionLauncher.ConnectionStatus.Loading, "");
         yield return new WaitForSeconds(0.5f); // optional delay

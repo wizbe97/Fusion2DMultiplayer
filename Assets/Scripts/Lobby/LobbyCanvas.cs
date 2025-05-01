@@ -5,7 +5,7 @@ using TMPro;
 using Fusion;
 using FusionUtilsEvents;
 
-public class LobbyCanvas : MonoBehaviour
+public class LobbyCanvas : NetworkBehaviour
 {
     public GameLauncher launcher;
 

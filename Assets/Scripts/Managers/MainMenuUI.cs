@@ -53,8 +53,9 @@ public class MainMenuUI : MonoBehaviour
 
         if (isOnline)
         {
-            SceneManager.LoadScene("Lobby_Online");
-            Debug.Log("Loading Online Lobby Scene with Save Slot: " + slotId);
+            // SceneManager.LoadScene("Lobby_Online");
+            // Debug.Log("Loading Online Lobby Scene with Save Slot: " + slotId);
+            JoinRandomRooom();
         }
         else
         {
@@ -62,7 +63,10 @@ public class MainMenuUI : MonoBehaviour
             Debug.Log("Loading Offline Lobby Scene with Save Slot: " + slotId);
         }
     }
-
+    public void JoinRandomRooom()
+    {
+        GlobalManagers.Instance.NetworkRunnerController.JoinRandomRooom();
+    }
     public void BackToMainMenu()
     {
         panelSaveSelection.SetActive(false);

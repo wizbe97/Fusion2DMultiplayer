@@ -6,10 +6,11 @@ using Fusion;
 using System;
 using Fusion.Sockets;
 
-public class FusionLauncher : MonoBehaviour
+public class FusionLauncher : NetworkBehaviour
 {
     private NetworkRunner _runner;
     private ConnectionStatus _status;
+
 
     public enum ConnectionStatus
     {

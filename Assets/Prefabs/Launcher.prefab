@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7539285009767304139}
   - component: {fileID: 4011419109246890317}
   - component: {fileID: 4958121450383132593}
+  - component: {fileID: 7658643929195325240}
   m_Layer: 0
   m_Name: Launcher
   m_TagString: Untagged
@@ -63,3 +64,22 @@ MonoBehaviour:
   OnPlayerLeftEvent: {fileID: 11400000, guid: 10623ea0c150657439b1026b986e893b, type: 2}
   OnShutdownEvent: {fileID: 11400000, guid: 36d5e3658179b8b469220795376261aa, type: 2}
   OnDisconnectedEvent: {fileID: 11400000, guid: 1b38ce383453ce448876322a0e748ddc, type: 2}
+--- !u!114 &7658643929195325240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6493560806560879542}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 3229522373
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 4011419109246890317}
+  ForceRemoteRenderTimeframe: 0
