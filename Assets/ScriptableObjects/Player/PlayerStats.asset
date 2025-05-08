@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4b56f797018491d459b1772ae5115f49, type: 3}
-  m_Name: Stats
+  m_Name: PlayerStats
   m_EditorClassIdentifier: 
   PlayerLayer:
     serializedVersion: 2
@@ -18,28 +18,60 @@ MonoBehaviour:
   CollisionLayers:
     serializedVersion: 2
     m_Bits: 128
+  CharacterSize:
+    Height: 1.77
+    Width: 0.93
+    StepHeight: 0.29
+    CrouchHeight: 1.05
+    RayInset: 0.0398
   VerticalDeadZoneThreshold: 0.3
   HorizontalDeadZoneThreshold: 0.10000000149011612
-  BaseSpeed: 3.5
-  Acceleration: 35
-  Friction: 30
+  PositionCorrectionMode: 0
+  BaseSpeed: 9
+  Acceleration: 70
+  Friction: 100
   AirFrictionMultiplier: 0.5
   DirectionCorrectionMultiplier: 3
   MaxWalkableSlope: 50
-  AllowAirJumps: 0
-  AirAcceleration: 10
-  MaxAirSpeed: 5
   ExtraConstantGravity: 40
   BufferedJumpTime: 0.15
   CoyoteTime: 0.15
-  JumpPower: 6
+  JumpPower: 15
   EndJumpEarlyExtraForceMultiplier: 3
   MaxAirJumps: 1
   AllowDash: 1
-  DashVelocity: 50
+  DashVelocity: 15
   DashDuration: 0.2
   DashCooldown: 1.5
   DashEndHorizontalMultiplier: 0.5
   AllowCrouching: 0
   CrouchSlowDownTime: 0.5
   CrouchSpeedModifier: 0.5
+  AllowWalls: 0
+  ClimbableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  WallJumpTotalInputLossTime: 0.2
+  WallJumpInputLossReturnTime: 0.5
+  RequireInputPush: 0
+  WallJumpPower: {x: 25, y: 15}
+  WallPushPower: {x: 15, y: 10}
+  WallClimbSpeed: 5
+  WallFallAcceleration: 20
+  WallPopForce: 5
+  WallCoyoteTime: 0.3
+  WallDetectorRange: 0.1
+  AllowLadders: 1
+  LadderCooldownTime: 0.15000000596046448
+  AutoAttachToLadders: 0
+  SnapToLadders: 1
+  LadderLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  LadderSnapTime: 0.02
+  LadderPopForce: 0
+  LadderClimbSpeed: 5
+  LadderSlideSpeed: 12
+  LadderShimmySpeedMultiplier: 0.5
+  NegativeYVelocityNegation: 0.2
+  ExternalVelocityDecayRate: 0.1

@@ -14,9 +14,8 @@ GameObject:
   - component: {fileID: 8025990251663222703}
   - component: {fileID: 53114956979535211}
   - component: {fileID: 6937720444980733764}
-  - component: {fileID: -1077410526562711412}
   m_Layer: 0
-  m_Name: RopeSegment
+  m_Name: RopeSegment 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78,7 +77,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 156e625d74afbe843be696ba995968cc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 48d1beb9b8451fd4fb5cce8ac4648fbd, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -176,8 +175,8 @@ BoxCollider2D:
   m_Offset: {x: -0.006672859, y: -0.5}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 1}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.02, y: 0.02}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -200,15 +199,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connectedAbove: {fileID: 0}
   connectedBelow: {fileID: 0}
---- !u!114 &-1077410526562711412
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1809426279289469222}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c95a689e52387d439dde7c3899a1e85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
