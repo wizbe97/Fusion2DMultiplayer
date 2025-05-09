@@ -19,7 +19,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 776
   CharacterSize:
-    Height: 1.35
+    Height: 1.25
     Width: 0.9
     StepHeight: 0.6
     CrouchHeight: 0.8
@@ -34,11 +34,11 @@ MonoBehaviour:
   AirFrictionMultiplier: 0.5
   DirectionCorrectionMultiplier: 3
   MaxWalkableSlope: 46
-  ExtraConstantGravity: 20
+  ExtraConstantGravity: 30
   BufferedJumpTime: 0.15
   CoyoteTime: 0.15
-  JumpPower: 12
-  EndJumpEarlyExtraForceMultiplier: 5
+  JumpPower: 15
+  EndJumpEarlyExtraForceMultiplier: 2
   MaxAirJumps: 0
   UseApexControl: 1
   ApexModifier: 1.25
@@ -48,7 +48,7 @@ MonoBehaviour:
   DashDuration: 0.1
   DashCooldown: 0.5
   DashEndHorizontalMultiplier: 0.5
-  AllowCrouching: 1
+  AllowCrouching: 0
   CrouchSlowDownTime: 1
   CrouchSpeedModifier: 0.3
   AllowWalls: 1
@@ -66,13 +66,13 @@ MonoBehaviour:
   WallCoyoteTime: 0.3
   WallDetectorRange: 0.15
   AllowLadders: 1
-  LadderCooldownTime: 0.15
+  LadderCooldownTime: 0.0015
   AutoAttachToLadders: 0
   SnapToLadders: 1
   LadderLayer:
     serializedVersion: 2
     m_Bits: 512
-  LadderSnapTime: 0.05
+  LadderSnapTime: 0.005
   LadderPopForce: 2
   LadderClimbSpeed: 8
   LadderSlideSpeed: 12

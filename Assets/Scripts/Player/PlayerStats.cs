@@ -29,6 +29,7 @@ public class PlayerStats : ScriptableObject
     [Tooltip("Controls how the character sticks to the ground on slopes and drops.\nVelocity: smooth but can be unreliable on sharp edges.\nImmediate: stable but might jitter.")]
     public PositionCorrectionMode PositionCorrectionMode = PositionCorrectionMode.Velocity;
 
+
     // Movement
     [Header("Movement"), Space]
     [Tooltip("Maximum ground speed when moving.")]

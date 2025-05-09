@@ -182,7 +182,6 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
     {
         _frameInput = _playerInput.Gather();
 
-
         if (_frameInput.JumpDown)
         {
             _jumpToConsume = true;
@@ -193,7 +192,16 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
         {
             _dashToConsume = true;
         }
+
+        // Reset latch permission if ladder grab was released
+        if (!_frameInput.LadderHeld && _mustReleaseLadderGrabBeforeLatch)
+        {
+            _canLatchLadder = true;
+            _mustReleaseLadderGrabBeforeLatch = false;
+        }
     }
+
+
 
     #endregion
 
@@ -463,9 +471,17 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
     #region Ladders
 
     private bool CanEnterLadder => _ladderHit && _time > _timeLeftLadder + Stats.LadderCooldownTime;
-    private bool ShouldMountLadder => Stats.AutoAttachToLadders || _frameInput.Move.y > Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit || !_grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit || _frameInput.LadderHeld && _ladderHit;
+    private bool ShouldMountLadder =>
+        _canLatchLadder && (
+            Stats.AutoAttachToLadders ||
+            (_frameInput.Move.y > Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit) ||
+            (!_grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit) ||
+            (_frameInput.LadderHeld && _ladderHit)
+        );
     private bool ShouldDismountLadder => !_frameInput.LadderHeld || !_ladderHit;
     private bool _wasClimbingLadderThisFrame;
+    private bool _canLatchLadder = true;
+    private bool _mustReleaseLadderGrabBeforeLatch = false;
 
 
     private float _timeLeftLadder;
@@ -592,6 +608,8 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
             case JumpType.LadderJump:
                 var input = _frameInput.Move;
                 var ladderJumpDir = new Vector2(input.x, 1).normalized;
+                _mustReleaseLadderGrabBeforeLatch = true; // require release before latching
+                _canLatchLadder = false;
                 AddFrameForce(ladderJumpDir * Stats.JumpPower);
                 break;
         }

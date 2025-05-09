@@ -4,9 +4,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 #endif
 
-using UnityEngine;
-using UnityEngine.InputSystem;
-
 public class PlayerInput : MonoBehaviour
 {
     private GameplayInputActions _actions;
