@@ -8,73 +8,183 @@ using UnityEngine;
 public class PlayerStats : ScriptableObject
 {
     // Setup
-    [Header("Setup")] public LayerMask PlayerLayer;
+    [Header("Setup")]
+    [Tooltip("Layer the player is on (used to exclude self in checks)")]
+    public LayerMask PlayerLayer;
+
+    [Tooltip("Layers considered solid for collisions, ground, walls, etc.")]
     public LayerMask CollisionLayers;
+
+    [Tooltip("Size and collider shape settings for the character")]
     public CharacterSize CharacterSize;
 
-
     // Controller Setup
-    [Header("Controller Setup"), Space] public float VerticalDeadZoneThreshold = 0.3f;
-    public double HorizontalDeadZoneThreshold = 0.1f;
-    [Tooltip("Velocity = smoother, but can be occasionally unreliable on jagged terrain. Immediate = Occasionally jittery, but stable")]
+    [Header("Controller Setup"), Space]
+    [Tooltip("Minimum vertical input value required to trigger up/down movement or interaction (e.g. climbing ladders, crouching). Prevents unintentional movement.")]
+    public float VerticalDeadZoneThreshold = 0.3f;
+
+    [Tooltip("Minimum horizontal input value required before considering movement left/right. Useful for analog sticks.")]
+    public double HorizontalDeadZoneThreshold = 0.1;
+
+    [Tooltip("Controls how the character sticks to the ground on slopes and drops.\nVelocity: smooth but can be unreliable on sharp edges.\nImmediate: stable but might jitter.")]
     public PositionCorrectionMode PositionCorrectionMode = PositionCorrectionMode.Velocity;
 
     // Movement
-    [Header("Movement"), Space] public float BaseSpeed = 9;
+    [Header("Movement"), Space]
+    [Tooltip("Maximum ground speed when moving.")]
+    public float BaseSpeed = 9;
+
+    [Tooltip("Rate of horizontal acceleration when input is held.")]
     public float Acceleration = 50;
+
+    [Tooltip("Rate of deceleration when no input is held (on ground).")]
     public float Friction = 30;
+    [Tooltip("Max rate of deceleration when falling).")]
+    public float MaxFallSpeed = 20f;
+
+    [Tooltip("Multiplier applied to acceleration and friction while airborne.")]
     public float AirFrictionMultiplier = 0.5f;
+
+    [Tooltip("Extra force applied when changing direction quickly to make turning snappier.")]
     public float DirectionCorrectionMultiplier = 3f;
+
+    [Tooltip("Maximum ground slope (in degrees) the player can walk on. Slopes steeper than this are considered walls.")]
     public float MaxWalkableSlope = 50;
 
     // Jump
-    [Header("Jump"), Space] public float ExtraConstantGravity = 40;
+    [Header("Jump"), Space]
+    [Tooltip("Constant downward force applied while airborne to improve jump feel")]
+    public float ExtraConstantGravity = 40;
+
+    [Tooltip("How long a jump input can be buffered before landing")]
     public float BufferedJumpTime = 0.15f;
+
+    [Tooltip("How long after falling off a ledge a jump can still be performed")]
     public float CoyoteTime = 0.15f;
+
+    [Tooltip("Force applied when jumping from the ground")]
     public float JumpPower = 20;
+
+    [Tooltip("Multiplier for gravity when jump is ended early")]
     public float EndJumpEarlyExtraForceMultiplier = 3;
+
+    [Tooltip("Maximum number of air jumps (excluding initial and coyote)")]
     public int MaxAirJumps = 1;
 
-    // Dash
-    [Header("Dash"), Space] public bool AllowDash = true;
-    public float DashVelocity = 50;
-    public float DashDuration = 0.2f;
-    public float DashCooldown = 1.5f;
-    public float DashEndHorizontalMultiplier = 0.5f;
+    [Tooltip("If true, gives the player more control at the apex of a jump")]
+    public bool UseApexControl = true;
+
+    [Tooltip("Multiplier applied to horizontal control at the apex")]
+    [Range(0f, 5f)] public float ApexModifier = 1.5f;
+
+    [Tooltip("Only triggers ApexControl when velocity.y is below this value (near true apex)")]
+    [Range(0f, 10f)] public float ApexDetectionThreshold = 2f;
+
 
     // Dash
-    [Header("Crouch"), Space] public bool AllowCrouching;
+    [Header("Dash"), Space]
+    [Tooltip("Enables dash functionality.")]
+    public bool AllowDash = true;
+
+    [Tooltip("Initial speed of the dash in the chosen direction.")]
+    public float DashVelocity = 50;
+
+    [Tooltip("How long the dash lasts in seconds.")]
+    public float DashDuration = 0.2f;
+
+    [Tooltip("Cooldown time before the player can dash again.")]
+    public float DashCooldown = 1.5f;
+
+    [Tooltip("Multiplier for horizontal speed at the end of a dash.")]
+    public float DashEndHorizontalMultiplier = 0.5f;
+
+    // Crouch
+    [Header("Crouch"), Space]
+    [Tooltip("Enables crouching.")]
+    public bool AllowCrouching;
+
+    [Tooltip("Time it takes to fully enter crouching speed state.")]
     public float CrouchSlowDownTime = 0.5f;
+
+    [Tooltip("Speed multiplier applied while crouching.")]
     public float CrouchSpeedModifier = 0.5f;
 
     // Walls
-    [Header("Walls"), Space] public bool AllowWalls;
+    [Header("Walls"), Space]
+    [Tooltip("Enables wall grabs and wall jumps.")]
+    public bool AllowWalls;
+
+    [Tooltip("Which layers are climbable (for wall interactions).")]
     public LayerMask ClimbableLayer;
+
+    [Tooltip("Time after jumping off a wall during which input is temporarily ignored.")]
     public float WallJumpTotalInputLossTime = 0.2f;
+
+    [Tooltip("Time it takes for horizontal control to fully return after a wall jump.")]
     public float WallJumpInputLossReturnTime = 0.5f;
+
+    [Tooltip("If true, player must be pushing into the wall to stick or grab it.")]
     public bool RequireInputPush;
+
+    [Tooltip("Jump force vector away from the wall when grabbing it.")]
     public Vector2 WallJumpPower = new(25, 15);
+
+    [Tooltip("Jump force vector when pushing off a wall without grabbing.")]
     public Vector2 WallPushPower = new(15, 10);
+
+    [Tooltip("Vertical climb speed while holding onto a wall.")]
     public float WallClimbSpeed = 5;
+
+    [Tooltip("Vertical acceleration downward while sliding down a wall.")]
     public float WallFallAcceleration = 20;
+
+    [Tooltip("Small vertical force applied when letting go of a wall to pop player off slightly.")]
     public float WallPopForce = 10;
+
+    [Tooltip("Time window after leaving a wall where a wall jump is still allowed.")]
     public float WallCoyoteTime = 0.3f;
+
+    [Tooltip("Distance from the player to check for climbable walls.")]
     public float WallDetectorRange = 0.1f;
 
     // Ladders
-    [Header("Ladders"), Space] public bool AllowLadders;
+    [Header("Ladders"), Space]
+    [Tooltip("Enables climbing ladders.")]
+    public bool AllowLadders;
+
+    [Tooltip("Cooldown time after leaving a ladder before reattaching is allowed.")]
     public double LadderCooldownTime = 0.15f;
+
+    [Tooltip("Automatically attach to ladder when moving into it (no grab input needed).")]
     public bool AutoAttachToLadders = true;
+
+    [Tooltip("If true, player snaps to the center of the ladder.")]
     public bool SnapToLadders = true;
+
+    [Tooltip("Which layers are considered ladders.")]
     public LayerMask LadderLayer;
+
+    [Tooltip("Smoothing time for snapping to ladder center.")]
     public float LadderSnapTime = 0.02f;
+
+    [Tooltip("Small vertical boost applied when jumping off a ladder.")]
     public float LadderPopForce = 10;
+
+    [Tooltip("Upward climbing speed on ladders.")]
     public float LadderClimbSpeed = 8;
+
+    [Tooltip("Downward sliding speed on ladders.")]
     public float LadderSlideSpeed = 12;
+
+    [Tooltip("Multiplier for shimmying left/right on a ladder while holding grab.")]
     public float LadderShimmySpeedMultiplier = 0.5f;
 
     // Moving Platforms
-    [Header("Moving Platforms"), Space] public float NegativeYVelocityNegation = 0.2f;
+    [Header("Moving Platforms"), Space]
+    [Tooltip("Multiplier to reduce negative Y velocity from platform movement when stepping off.")]
+    public float NegativeYVelocityNegation = 0.2f;
+
+    [Tooltip("Rate at which externally applied velocity decays over time.")]
     public float ExternalVelocityDecayRate = 0.1f;
 
     private void OnValidate()

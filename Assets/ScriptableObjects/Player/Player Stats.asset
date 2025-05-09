@@ -27,20 +27,24 @@ MonoBehaviour:
   VerticalDeadZoneThreshold: 0.3
   HorizontalDeadZoneThreshold: 0.1
   PositionCorrectionMode: 0
-  BaseSpeed: 10
-  Acceleration: 100
+  BaseSpeed: 6
+  Acceleration: 80
   Friction: 70
+  MaxFallSpeed: 20
   AirFrictionMultiplier: 0.5
   DirectionCorrectionMultiplier: 3
   MaxWalkableSlope: 46
-  ExtraConstantGravity: 40
+  ExtraConstantGravity: 20
   BufferedJumpTime: 0.15
   CoyoteTime: 0.15
-  JumpPower: 20
-  EndJumpEarlyExtraForceMultiplier: 3
+  JumpPower: 12
+  EndJumpEarlyExtraForceMultiplier: 5
   MaxAirJumps: 0
+  UseApexControl: 1
+  ApexModifier: 1.25
+  ApexDetectionThreshold: 3
   AllowDash: 1
-  DashVelocity: 30
+  DashVelocity: 15
   DashDuration: 0.1
   DashCooldown: 0.5
   DashEndHorizontalMultiplier: 0.5
@@ -69,7 +73,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   LadderSnapTime: 0.05
-  LadderPopForce: 5
+  LadderPopForce: 2
   LadderClimbSpeed: 8
   LadderSlideSpeed: 12
   LadderShimmySpeedMultiplier: 0.1

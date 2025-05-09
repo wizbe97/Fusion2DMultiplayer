@@ -87,8 +87,13 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
     private void OnDestroy() => PhysicsSimulator.Instance.RemovePlayer(this);
 
-    public void OnValidate() => SetupCharacter();
-
+    public void OnValidate()
+    {
+#if UNITY_EDITOR
+        if (Stats != null && Stats.CharacterSize != null)
+            SetupCharacter();
+#endif
+    }
     public void TickUpdate(float delta, float time)
     {
         _delta = delta;
@@ -102,6 +107,8 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
         _delta = delta;
 
         if (!Active) return;
+        _wasClimbingLadderThisFrame = ClimbingLadder;
+
 
         RemoveTransientVelocity();
 
@@ -109,10 +116,11 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
         CalculateCollisions();
         CalculateDirection();
+        CalculateJump();
 
         CalculateWalls();
         CalculateLadders();
-        CalculateJump();
+
         CalculateDash();
 
         CalculateExternalModifiers();
@@ -456,7 +464,9 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
     private bool CanEnterLadder => _ladderHit && _time > _timeLeftLadder + Stats.LadderCooldownTime;
     private bool ShouldMountLadder => Stats.AutoAttachToLadders || _frameInput.Move.y > Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit || !_grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit || _frameInput.LadderHeld && _ladderHit;
-    private bool ShouldDismountLadder => !Stats.AutoAttachToLadders && _grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold || !_frameInput.LadderHeld || !_ladderHit;
+    private bool ShouldDismountLadder => !_frameInput.LadderHeld || !_ladderHit;
+    private bool _wasClimbingLadderThisFrame;
+
 
     private float _timeLeftLadder;
     private Collider2D _ladderHit;
@@ -751,9 +761,6 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
         {
             _rb.velocity += AdditionalFrameVelocities();
             _rb.AddForce(_forceToApplyThisFrame * _rb.mass, ForceMode2D.Impulse);
-
-            // Returning provides the crispest & most accurate jump experience
-            // Required for reliable slope jumps
             return;
         }
 
@@ -762,121 +769,139 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
             SetVelocity(_dashVel);
             return;
         }
-
         if (_isOnWall)
         {
             _constantForce.force = Vector2.zero;
 
             float wallVelocity;
-            if (_frameInput.Move.y != 0) wallVelocity = _frameInput.Move.y * Stats.WallClimbSpeed;
-            else wallVelocity = Mathf.MoveTowards(Mathf.Min(Velocity.y, 0), -Stats.WallClimbSpeed, Stats.WallFallAcceleration * _delta);
+            if (_frameInput.Move.y != 0)
+                wallVelocity = _frameInput.Move.y * Stats.WallClimbSpeed;
+            else
+                wallVelocity = Mathf.MoveTowards(Mathf.Min(Velocity.y, 0), -Stats.WallClimbSpeed, Stats.WallFallAcceleration * _delta);
 
             SetVelocity(new Vector2(_rb.velocity.x, wallVelocity));
             return;
         }
 
-        if (ClimbingLadder)
+        if (_wasClimbingLadderThisFrame && ClimbingLadder)
         {
             _constantForce.force = Vector2.zero;
             _rb.gravityScale = 0;
 
             var goalVelocity = Vector2.zero;
 
-            // Vertical movement (always allowed)
-            goalVelocity.y = _frameInput.Move.y * (_frameInput.Move.y > 0 ? Stats.LadderClimbSpeed : Stats.LadderSlideSpeed);
+            // Calculate vertical ladder movement
+            float desiredY = _frameInput.Move.y * (_frameInput.Move.y > 0 ? Stats.LadderClimbSpeed : Stats.LadderSlideSpeed);
+
+            // Clamp position within ladder bounds
+            var ladderBounds = _ladderHit.bounds;
+            float nextYPos = _framePosition.y + desiredY * _delta;
+            // Bottom pivot means Y is at feet. Adjust accordingly.
+            float feetToHead = _character.Height;
+            float clampedY = Mathf.Clamp(
+                nextYPos,
+                ladderBounds.min.y + SKIN_WIDTH,                            // prevent feet from going below bottom
+                ladderBounds.max.y - feetToHead - SKIN_WIDTH               // prevent head from going above top
+            );
+
+
+            goalVelocity.y = (clampedY - _framePosition.y) / _delta;
 
             float goalX;
-
             if (Stats.SnapToLadders)
             {
-                // Always snap to center of ladder regardless of input
                 var targetX = _ladderHit.transform.position.x;
                 goalX = Mathf.SmoothDamp(_framePosition.x, targetX, ref _ladderSnapVel, Stats.LadderSnapTime);
             }
             else if (_frameInput.LadderHeld)
             {
-                // Freeze horizontal position while holding grab (if not snapping)
                 goalX = _framePosition.x;
             }
             else
             {
-                // Allow horizontal shimmy movement
                 goalX = Mathf.MoveTowards(_framePosition.x, _framePosition.x + _frameInput.Move.x, Stats.Acceleration * Stats.LadderShimmySpeedMultiplier * _delta);
             }
 
             goalVelocity.x = (goalX - _framePosition.x) / _delta;
-
             SetVelocity(goalVelocity);
             return;
         }
 
 
-
+        // Extra gravity
         var extraForce = new Vector2(0, _grounded ? 0 : -Stats.ExtraConstantGravity * (_endedJumpEarly && Velocity.y > 0 ? Stats.EndJumpEarlyExtraForceMultiplier : 1));
         _constantForce.force = extraForce * _rb.mass;
 
-        var targetSpeed = _hasInputThisFrame ? Stats.BaseSpeed : 0;
+        float targetSpeed = _hasInputThisFrame ? Stats.BaseSpeed : 0;
 
         if (Crouching)
         {
-            var crouchPoint = Mathf.InverseLerp(0, Stats.CrouchSlowDownTime, _time - _timeStartedCrouching);
+            float crouchPoint = Mathf.InverseLerp(0, Stats.CrouchSlowDownTime, _time - _timeStartedCrouching);
             targetSpeed *= Mathf.Lerp(1, Stats.CrouchSpeedModifier, crouchPoint);
         }
 
-        var step = _hasInputThisFrame ? Stats.Acceleration : Stats.Friction;
+        float step = _hasInputThisFrame ? Stats.Acceleration : Stats.Friction;
+        Vector2 xDir = _hasInputThisFrame ? _frameDirection : Velocity.normalized;
 
-        var xDir = (_hasInputThisFrame ? _frameDirection : Velocity.normalized);
+        if (Vector2.Dot(_trimmedFrameVelocity, _frameDirection) < 0)
+            step *= Stats.DirectionCorrectionMultiplier;
 
-        // Quicker direction change
-        if (Vector3.Dot(_trimmedFrameVelocity, _frameDirection) < 0) step *= Stats.DirectionCorrectionMultiplier;
+        // Apex control logic
+        bool inApex = !_grounded && Mathf.Abs(Velocity.y) < Stats.ApexDetectionThreshold;
+        if (Stats.UseApexControl && inApex)
+        {
+            targetSpeed *= Stats.ApexModifier;
+        }
+
 
         Vector2 newVelocity;
         step *= _delta;
+
         if (_grounded)
         {
-            var speed = Mathf.MoveTowards(Velocity.magnitude, targetSpeed, step);
+            float speed = Mathf.MoveTowards(Velocity.magnitude, targetSpeed, step);
+            Vector2 targetVelocity = xDir * speed;
+            float newSpeed = Mathf.MoveTowards(Velocity.magnitude, targetVelocity.magnitude, step);
 
-            // Blend the two approaches
-            var targetVelocity = xDir * speed;
+            var smoothed = Vector2.MoveTowards(Velocity, targetVelocity, step);
+            var direct = targetVelocity.normalized * newSpeed;
+            float slopePoint = Mathf.InverseLerp(0, SLOPE_ANGLE_FOR_EXACT_MOVEMENT, Mathf.Abs(_frameDirection.y));
 
-            // Calculate the new speed based on the current and target speeds
-            var newSpeed = Mathf.MoveTowards(Velocity.magnitude, targetVelocity.magnitude, step);
-
-            // TODO: Lets actually trace the ground direction automatically instead of direct
-            var smoothed = Vector2.MoveTowards(Velocity, targetVelocity, step); // Smooth but potentially inaccurate
-            var direct = targetVelocity.normalized * newSpeed; // Accurate but abrupt
-            var slopePoint = Mathf.InverseLerp(0, SLOPE_ANGLE_FOR_EXACT_MOVEMENT, Mathf.Abs(_frameDirection.y)); // Blend factor
-
-            // Calculate the blended velocity
             newVelocity = Vector2.Lerp(smoothed, direct, slopePoint);
         }
         else
         {
             step *= Stats.AirFrictionMultiplier;
 
-            if (_wallJumpInputNerfPoint < 1 && (int)Mathf.Sign(xDir.x) == (int)Mathf.Sign(_wallDirectionForJump))
+            if (_wallJumpInputNerfPoint < 1 && Mathf.Sign(xDir.x) == Mathf.Sign(_wallDirectionForJump))
             {
-                if (_time < _returnWallInputLossAfter) xDir.x = -_wallDirectionForJump;
-                else xDir.x *= _wallJumpInputNerfPoint;
+                xDir.x = (_time < _returnWallInputLossAfter)
+                    ? -_wallDirectionForJump
+                    : xDir.x * _wallJumpInputNerfPoint;
             }
 
-            var targetX = Mathf.MoveTowards(_trimmedFrameVelocity.x, xDir.x * targetSpeed, step);
+            float targetX = Mathf.MoveTowards(_trimmedFrameVelocity.x, xDir.x * targetSpeed, step);
             newVelocity = new Vector2(targetX, _rb.velocity.y);
         }
+
+        // Clamp fall speed
+        float maxFallSpeed = -Mathf.Abs(Stats.MaxFallSpeed); // ensure it's negative
+        if (newVelocity.y < maxFallSpeed)
+            newVelocity.y = maxFallSpeed;
+
 
         SetVelocity((newVelocity + AdditionalFrameVelocities()) * _currentFrameSpeedModifier);
 
         Vector2 AdditionalFrameVelocities()
         {
             if (_immediateMove.sqrMagnitude > SKIN_WIDTH)
-            {
                 _rb.MovePosition(_framePosition + _immediateMove);
-            }
 
             _totalTransientVelocityAppliedLastFrame = _frameTransientVelocity + _decayingTransientVelocity;
             return _totalTransientVelocityAppliedLastFrame;
         }
     }
+
 
     private void SetVelocity(Vector2 newVel)
     {
