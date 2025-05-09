@@ -520,6 +520,11 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
         if (IsClimbingLadder)
         {
+            if (!_frameInput.LadderHeld)
+            {
+                ToggleClimbingLadder(false);
+                return;
+            }
             _constantForce.force = Vector2.zero;
             _rigidbody.gravityScale = 0;
 
@@ -696,7 +701,7 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
     #region Ladders
 
     private bool CanEnterLadder => _ladderHit && _timeSinceStart > _timeLeftLadder + PlayerStats.LadderCooldownTime;
-    private bool ShouldMountLadder => PlayerStats.AutoAttachToLadders || _frameInput.Move.y > PlayerStats.VerticalDeadZoneThreshold || (!_isGrounded && _frameInput.Move.y < -PlayerStats.VerticalDeadZoneThreshold);
+    private bool ShouldMountLadder => PlayerStats.AutoAttachToLadders || _frameInput.Move.y > PlayerStats.VerticalDeadZoneThreshold || (!_isGrounded && _frameInput.Move.y < -PlayerStats.VerticalDeadZoneThreshold) || _frameInput.LadderHeld && CanEnterLadder;
     private bool ShouldDismountLadder => !PlayerStats.AutoAttachToLadders && _isGrounded && _frameInput.Move.y < -PlayerStats.VerticalDeadZoneThreshold;
 
     private float _timeLeftLadder;
@@ -719,6 +724,7 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
     private void ToggleClimbingLadder(bool on)
     {
         if (IsClimbingLadder == on) return;
+
         if (on)
         {
             SetVelocity(Vector2.zero);
@@ -727,10 +733,17 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
         }
         else
         {
-            if (_ladderHit) _timeLeftLadder = _timeSinceStart; // to prevent immediately re-mounting ladder
+            if (_ladderHit) _timeLeftLadder = _timeSinceStart;
+
             if (_frameInput.Move.y > 0)
             {
-                AddForceThisFrame(new Vector2(0, PlayerStats.LadderPopForce));
+                var force = new Vector2(0, PlayerStats.LadderPopForce);
+                Debug.Log($"[LADDER] Leaving ladder with upward pop force: {force}, current velocity: {CurrentVelocity}");
+                AddForceThisFrame(force);
+            }
+            else
+            {
+                Debug.Log($"[LADDER] Leaving ladder with NO pop. Velocity retained: {CurrentVelocity}");
             }
 
             _rigidbody.gravityScale = GRAVITY_SCALE;
@@ -739,6 +752,7 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
         IsClimbingLadder = on;
         ResetAirJumps();
     }
+
 
     #endregion
 
@@ -788,20 +802,12 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
                 Debug.Log("Executing Air Jump");
                 ExecuteJump(JumpType.AirJump);
             }
-            else
-            {
-                Debug.LogWarning("Jump input detected, but no jump condition passed.");
-            }
-        }
-        else
-        {
-            Debug.Log($"No jump triggered. JumpToConsume: {_jumpToConsume}, BufferedJump: {HasBufferedJump}, CanStand: {CanStand}, isGrounded: {_isGrounded};");
+
         }
 
         if ((!_endedJumpEarly && !_isGrounded && !_frameInput.JumpHeld && CurrentVelocity.y > 0) || CurrentVelocity.y < 0)
         {
             _endedJumpEarly = true;
-            Debug.Log("Early jump end triggered");
         }
 
         if (_timeSinceStart > _returnWallInputLossAfter)
