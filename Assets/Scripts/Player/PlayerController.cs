@@ -614,6 +614,7 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
                 var ladderJumpDir = new Vector2(input.x, 1).normalized;
                 _mustReleaseLadderGrabBeforeLatch = true; // require release before latching
                 _canLatchLadder = false;
+                SetVelocity(Vector2.zero);
                 AddFrameForce(ladderJumpDir * Stats.JumpPower);
                 break;
         }
