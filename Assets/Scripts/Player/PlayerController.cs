@@ -472,12 +472,16 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
     private bool CanEnterLadder => _ladderHit && _time > _timeLeftLadder + Stats.LadderCooldownTime;
     private bool ShouldMountLadder =>
-        _canLatchLadder && (
+        _canLatchLadder &&
+        _ladderHit &&
+        Mathf.Abs(_ladderHit.transform.position.x - _framePosition.x) <= Stats.MaxLadderSnapDistance &&
+        (
             Stats.AutoAttachToLadders ||
-            (_frameInput.Move.y > Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit) ||
-            (!_grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld && _ladderHit) ||
-            (_frameInput.LadderHeld && _ladderHit)
+            (_frameInput.Move.y > Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld) ||
+            (!_grounded && _frameInput.Move.y < -Stats.VerticalDeadZoneThreshold && _frameInput.LadderHeld) ||
+            (_frameInput.LadderHeld)
         );
+
     private bool ShouldDismountLadder => !_frameInput.LadderHeld || !_ladderHit;
     private bool _wasClimbingLadderThisFrame;
     private bool _canLatchLadder = true;
@@ -1001,6 +1005,18 @@ public class PlayerController : MonoBehaviour, IPlayerController, IPhysicsObject
 
         Gizmos.color = Color.black;
         Gizmos.DrawRay(RayPoint, Vector3.right);
+
+        // Ladder snap distance visualizer
+        if (Stats != null && Stats.AllowLadders && Stats.SnapToLadders)
+        {
+            Gizmos.color = new Color(1f, 0.7f, 0.9f, 1f); // Light pink
+
+            var posBox = (Vector2)transform.position;
+            var size = new Vector2(Stats.MaxLadderSnapDistance * 2, _character.Height);
+
+            Gizmos.DrawWireCube(posBox + Vector2.up * (_character.Height / 2), size);
+        }
+
     }
 
     #endregion

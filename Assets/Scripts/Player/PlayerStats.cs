@@ -168,6 +168,11 @@ public class PlayerStats : ScriptableObject
     [Tooltip("Smoothing time for snapping to ladder center.")]
     public float LadderSnapTime = 0.02f;
 
+    [Tooltip("Distance from the ladder to check for a valid snap.")]
+    [Range(0f, 1f)]
+    public float MaxLadderSnapDistance = 0.25f;
+
+
     [Tooltip("Small vertical boost applied when jumping off a ladder.")]
     public float LadderPopForce = 10;
 

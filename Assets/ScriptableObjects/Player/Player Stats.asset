@@ -73,9 +73,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   LadderSnapTime: 0.005
+  MaxLadderSnapDistance: 0.173
   LadderPopForce: 2
-  LadderClimbSpeed: 8
-  LadderSlideSpeed: 12
+  LadderClimbSpeed: 6
+  LadderSlideSpeed: 8
   LadderShimmySpeedMultiplier: 0.1
   NegativeYVelocityNegation: 0.2
   ExternalVelocityDecayRate: 0.5
